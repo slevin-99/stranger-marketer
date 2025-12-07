@@ -42,7 +42,7 @@ export default function LandingHero() {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className="mb-6 font-mono text-neon-green tracking-widest text-sm md:text-base border border-neon-green/30 px-4 py-1 rounded bg-black/50 backdrop-blur-sm"
+                    className="mt-20 mb-6 font-mono text-neon-green tracking-widest text-sm md:text-base border border-neon-green/30 px-4 py-1 rounded bg-black/50 backdrop-blur-sm"
                 >
                     HAWKINS MARKETING LAB — CLASSIFICATO
                 </motion.div>
