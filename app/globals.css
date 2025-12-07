@@ -1,26 +1,168 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Color Palette */
+  --neon-red: #ff0040;
+  --neon-blue: #00d4ff;
+  --neon-green: #39ff14;
+  --neon-yellow: #fff01f;
+
+  --dark-bg: #0a0a0a;
+  --dark-secondary: #1a1a1a;
+
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+
+  --glow-red: rgba(255, 0, 64, 0.5);
+  --glow-blue: rgba(0, 212, 255, 0.5);
+
+  /* Character Colors */
+  --color-eleven: #ff0040;
+  --color-dustin: #00d4ff;
+  --color-mike: #39ff14;
+  --color-lucas: #ff6b00;
+  --color-will: #9d4edd;
+  --color-max: #e63946;
+  --color-steve: #ffd60a;
+  --color-nancy: #4cc9f0;
+  --color-jonathan: #7209b7;
+  --color-joyce: #d00000;
+  --color-hopper: #003566;
+  --color-murray: #06ffa5;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@theme {
+  /* Map CSS variables to Tailwind utilities */
+  --color-neon-red: var(--neon-red);
+  --color-neon-blue: var(--neon-blue);
+  --color-neon-green: var(--neon-green);
+  --color-neon-yellow: var(--neon-yellow);
+  --color-dark-bg: var(--dark-bg);
+  --color-dark-secondary: var(--dark-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Character specific colors */
+  --color-eleven: var(--color-eleven);
+  --color-dustin: var(--color-dustin);
+  --color-mike: var(--color-mike);
+  --color-lucas: var(--color-lucas);
+  --color-will: var(--color-will);
+  --color-max: var(--color-max);
+  --color-steve: var(--color-steve);
+  --color-nancy: var(--color-nancy);
+  --color-jonathan: var(--color-jonathan);
+  --color-joyce: var(--color-joyce);
+  --color-hopper: var(--color-hopper);
+  --color-murray: var(--color-murray);
+
+  /* Fonts */
+  --font-heading: var(--font-bebas);
+  --font-body: var(--font-inter);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--dark-bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* 
+  ===========================================
+   GLOBAL EFFECTS
+  ===========================================
+*/
+
+/* Scanline overlay */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Grain/noise texture */
+.grain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Neon glow effect utility */
+.neon-glow {
+  text-shadow:
+    0 0 7px currentColor,
+    0 0 10px currentColor,
+    0 0 21px currentColor;
+}
+
+/* VHS glitch effect */
+@keyframes glitch {
+  0% {
+    transform: translate(0)
+  }
+
+  20% {
+    transform: translate(-2px, 2px)
+  }
+
+  40% {
+    transform: translate(-2px, -2px)
+  }
+
+  60% {
+    transform: translate(2px, 2px)
+  }
+
+  80% {
+    transform: translate(2px, -2px)
+  }
+
+  100% {
+    transform: translate(0)
+  }
+}
+
+.glitch-anim {
+  animation: glitch 0.3s infinite;
+}
+
+/* Chromatic aberration on hover */
+.chromatic:hover {
+  text-shadow:
+    -2px 0 0 #ff0040,
+    2px 0 0 #00d4ff;
+}
+
+/* Retro button style */
+.retro-button {
+  background: transparent;
+  border: 2px solid currentColor;
+  box-shadow:
+    inset 0 0 20px rgba(255, 255, 255, 0.1),
+    0 0 20px currentColor;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+}
+
+.retro-button:hover {
+  box-shadow:
+    inset 0 0 30px rgba(255, 255, 255, 0.2),
+    0 0 30px currentColor;
+  transform: scale(1.05);
 }
