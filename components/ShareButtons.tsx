@@ -1,7 +1,7 @@
 "use client";
 
 import { Character } from "@/lib/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 interface ShareButtonsProps {
@@ -11,9 +11,27 @@ interface ShareButtonsProps {
 export default function ShareButtons({ character }: ShareButtonsProps) {
     const [copied, setCopied] = useState(false);
     const [downloading, setDownloading] = useState(false);
+    const [shareFile, setShareFile] = useState<File | null>(null);
 
     const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/result/${character.id}` : '';
     const shareText = `Sono ${character.name} - ${character.role}. Che Marketer di Stranger Things sei?`;
+
+    // Generate blob on mount
+    useEffect(() => {
+        let isMounted = true;
+
+        const prepareShareImage = async () => {
+            const blob = await generateImageBlob();
+            if (blob && isMounted) {
+                const file = new File([blob], `stranger-marketer-${character.id}.png`, { type: 'image/png' });
+                setShareFile(file);
+            }
+        };
+
+        prepareShareImage();
+
+        return () => { isMounted = false; };
+    }, [character]);
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(shareUrl);
@@ -21,7 +39,7 @@ export default function ShareButtons({ character }: ShareButtonsProps) {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    // Helper to generate the image file
+    // Helper to generate the image blob
     const generateImageBlob = async (): Promise<Blob | null> => {
         try {
             const canvas = document.createElement('canvas');
@@ -153,46 +171,56 @@ export default function ShareButtons({ character }: ShareButtonsProps) {
             return;
         }
 
-        // Instagram (or generic Mobile Share): Prefer Native File Share
+        // Instagram / Mobile Share
         if (platform === 'instagram') {
-            setDownloading(true);
-            const blob = await generateImageBlob();
-            setDownloading(false);
+            // If file isn't ready yet, we can't share instantly. 
+            // Ideally we disable the button until ready, but as fallback we can try to generate (though it might fail on mobile)
+            const fileToShare = shareFile;
 
-            if (!blob) return;
+            if (!fileToShare) {
+                // Fallback if user clicks TOO fast
+                alert("L'immagine si sta ancora generando, riprova tra un secondo!");
+                return;
+            }
 
-            const file = new File([blob], `stranger-marketer-${character.id}.png`, { type: 'image/png' });
-
-            // Check if native sharing is supported (Mobile)
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            if (navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
                 try {
                     await navigator.share({
-                        files: [file],
+                        files: [fileToShare],
                         title: 'Stranger Things Marketer Quiz',
                         text: shareText,
                     });
                 } catch (err) {
-                    console.log('Share canceled or failed', err);
+                    // Share cancelled or failed
+                    console.log('Share error:', err);
                 }
             } else {
-                // Fallback for Desktop: Download the file
+                // Fallback for Desktop or unsupported browsers: Download
                 const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `stranger-marketer-${character.id}.png`;
+                link.href = URL.createObjectURL(fileToShare);
+                link.download = fileToShare.name;
                 link.click();
             }
         }
     };
 
     const downloadImage = async () => {
-        setDownloading(true);
-        const blob = await generateImageBlob();
-        setDownloading(false);
-        if (blob) {
+        if (shareFile) {
             const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `stranger-marketer-${character.id}.png`;
+            link.href = URL.createObjectURL(shareFile);
+            link.download = shareFile.name;
             link.click();
+        } else {
+            // Fallback generate
+            setDownloading(true);
+            const blob = await generateImageBlob();
+            setDownloading(false);
+            if (blob) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `stranger-marketer-${character.id}.png`;
+                link.click();
+            }
         }
     };
 
@@ -207,7 +235,8 @@ export default function ShareButtons({ character }: ShareButtonsProps) {
                 <ShareButton
                     label="Instagram"
                     onClick={() => handleShare('instagram')}
-                    color="bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888]"
+                    color={shareFile ? "bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888]" : "bg-white/10 opacity-50 cursor-not-allowed"}
+                // Disable visual feedback if not ready? Or just handle in click.
                 />
                 <ShareButton
                     label="X / Twitter"
