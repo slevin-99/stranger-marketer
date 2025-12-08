@@ -16,14 +16,32 @@ export async function generateMetadata(
 
     if (!character) return {};
 
+    const siteUrl = 'https://stranger-marketers.com'; // In production this should be env var
+
     return {
-        title: `I am ${character.name} - ${character.role} | Stranger Things Marketing Quiz`,
-        description: character.description,
+        title: `I am ${character.name} - The ${character.role} | Stranger Things Marketing Quiz`,
+        description: character.description.slice(0, 160),
         openGraph: {
-            title: `I am ${character.name} - The ${character.role}`,
-            description: character.description,
-            // images: [`/og-images/${character.id}.png`],
-        }
+            title: `I'm ${character.name} - ${character.nickname}`,
+            description: character.description.slice(0, 200),
+            images: [
+                {
+                    url: `${siteUrl}/api/og?character=${character.id}`,
+                    width: 1200,
+                    height: 630,
+                    alt: `${character.name} - ${character.role}`,
+                }
+            ],
+            type: 'website',
+            url: `${siteUrl}/result/${character.id}`,
+            siteName: 'Stranger Things Marketing Quiz',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `I'm ${character.name} - The ${character.role}`,
+            description: character.description.slice(0, 200),
+            images: [`${siteUrl}/api/og?character=${character.id}`],
+        },
     };
 }
 

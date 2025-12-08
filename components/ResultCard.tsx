@@ -50,7 +50,7 @@ export default function ResultCard({ primary, secondary }: ResultCardProps) {
                             ROLE: <span style={{ color: primary.color }}>{primary.role}</span>
                         </div>
 
-                        <div className="mt-auto w-full">
+                        <div className="mt-auto w-full hidden lg:block">
                             <ShareButtons character={primary} />
                         </div>
                     </div>
@@ -108,6 +108,14 @@ export default function ResultCard({ primary, secondary }: ResultCardProps) {
                                 </p>
                             </div>
                         )}
+
+                        {/* Mobile Share Section (Bottom) */}
+                        <div className="mt-12 block lg:hidden">
+                            <h3 className="font-heading text-xl text-white mb-4 text-center tracking-wider neon-glow">
+                                CONDIVIDI IL TUO RISULTATO
+                            </h3>
+                            <ShareButtons character={primary} />
+                        </div>
                     </div>
                 </div>
             </motion.div>
