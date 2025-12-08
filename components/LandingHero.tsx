@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
@@ -33,7 +34,18 @@ export default function LandingHero() {
         <div className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden text-center p-4">
 
             {/* Background Ambience */}
-            <div className="absolute inset-0 bg-gradient-radial from-red-900/10 to-transparent opacity-50 z-0" />
+            <div className="absolute inset-0 z-0 select-none">
+                <Image
+                    src="/hero-bg-v4.png"
+                    alt="Hawkins Marketing Laboratory Atmosphere"
+                    fill
+                    priority
+                    className="object-cover opacity-80"
+                    quality={90}
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-dark-bg/90" />
+                <div className="absolute inset-0 bg-gradient-radial from-transparent to-black/60" />
+            </div>
 
             {/* Main Content */}
             <div className="z-10 relative flex flex-col items-center">
