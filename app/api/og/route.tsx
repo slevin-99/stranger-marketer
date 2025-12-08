@@ -28,6 +28,7 @@ export async function GET(request: Request) {
                         backgroundColor: '#0a0a0a',
                         backgroundImage: `radial-gradient(circle at 50% 50%, ${character.color}40, #0a0a0a 70%)`,
                         fontFamily: 'sans-serif',
+                        position: 'relative',
                     }}
                 >
                     {/* Main Container */}
@@ -43,13 +44,14 @@ export async function GET(request: Request) {
                         }}
                     >
                         {/* IO SONO */}
-                        <div style={{ color: 'white', fontSize: 32, marginBottom: 20, fontWeight: 'bold' }}>
+                        <div style={{ display: 'flex', color: 'white', fontSize: 32, marginBottom: 20, fontWeight: 'bold' }}>
                             IO SONO
                         </div>
 
                         {/* Character Name */}
                         <div
                             style={{
+                                display: 'flex',
                                 color: character.color,
                                 fontSize: 100,
                                 fontWeight: 900,
@@ -65,10 +67,11 @@ export async function GET(request: Request) {
                         {/* Role */}
                         <div
                             style={{
+                                display: 'flex',
                                 color: 'white',
                                 fontSize: 36,
                                 textTransform: 'uppercase',
-                                letterSpacing: '6px',
+                                letterSpacing: 6,
                                 marginBottom: 40,
                                 textAlign: 'center',
                             }}
@@ -79,6 +82,7 @@ export async function GET(request: Request) {
                         {/* Mantra */}
                         <div
                             style={{
+                                display: 'flex',
                                 color: '#888',
                                 fontSize: 24,
                                 fontStyle: 'italic',
@@ -86,7 +90,7 @@ export async function GET(request: Request) {
                                 maxWidth: '80%',
                             }}
                         >
-                            "{character.mantra}"
+                            &quot;{character.mantra}&quot;
                         </div>
                     </div>
 
@@ -94,16 +98,16 @@ export async function GET(request: Request) {
                     <div
                         style={{
                             position: 'absolute',
-                            bottom: '40px',
+                            bottom: 40,
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                         }}
                     >
-                        <div style={{ color: character.color, fontSize: 20, marginBottom: 8 }}>
+                        <div style={{ display: 'flex', color: character.color, fontSize: 20, marginBottom: 8 }}>
                             CHE MARKETER DI STRANGER THINGS SEI?
                         </div>
-                        <div style={{ color: '#555', fontSize: 18 }}>
+                        <div style={{ display: 'flex', color: '#555', fontSize: 18 }}>
                             stranger-marketers.com
                         </div>
                     </div>
@@ -122,4 +126,3 @@ export async function GET(request: Request) {
         });
     }
 }
-
