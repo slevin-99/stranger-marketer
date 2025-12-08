@@ -3,9 +3,17 @@ import { characters } from '@/lib/quizData';
 
 export const runtime = 'edge';
 
-export default async function Image({ params }: { params: { character: string } }) {
-    // Await params if necessary in newer Next.js versions, but in 16 it is often still sync or awaits automatically in handlers
-    // Safely get character ID
+// Required exports for Next.js App Router opengraph-image convention
+export const size = {
+    width: 1200,
+    height: 630,
+};
+
+export const contentType = 'image/png';
+
+const BASE_URL = 'https://stranger-marketers.com';
+
+export default async function Image({ params }: { params: Promise<{ character: string }> }) {
     const { character: characterId } = await params;
 
     const character = characters.find((c) => c.id === characterId) || characters[0];
@@ -68,7 +76,7 @@ export default async function Image({ params }: { params: { character: string } 
                     >
                         {/* Using absolute URL for OG image generation */}
                         <img
-                            src={`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}${character.image}`}
+                            src={`${BASE_URL}${character.image}`}
                             width="240"
                             height="240"
                             style={{ objectFit: 'cover' }}
