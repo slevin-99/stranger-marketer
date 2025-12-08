@@ -19,14 +19,14 @@ export async function generateMetadata(
     const siteUrl = 'https://stranger-marketers.com'; // In production this should be env var
 
     return {
-        title: `I am ${character.name} - The ${character.role} | Stranger Things Marketing Quiz`,
-        description: character.description.slice(0, 160),
+        title: `Sono ${character.name} nel mondo del Marketing! | Stranger Marketers`,
+        description: `Ho scoperto di essere ${character.role} - Fai il quiz!`,
         openGraph: {
-            title: `I'm ${character.name} - ${character.nickname}`,
-            description: character.description.slice(0, 200),
+            title: `Sono ${character.name} nel mondo del Marketing!`,
+            description: `Ho scoperto di essere ${character.role} - Fai il quiz!`,
             images: [
                 {
-                    url: `${siteUrl}/api/og?character=${character.id}`,
+                    url: `${siteUrl}/result/${character.id}/opengraph-image`,
                     width: 1200,
                     height: 630,
                     alt: `${character.name} - ${character.role}`,
@@ -34,13 +34,13 @@ export async function generateMetadata(
             ],
             type: 'website',
             url: `${siteUrl}/result/${character.id}`,
-            siteName: 'Stranger Things Marketing Quiz',
+            siteName: 'Stranger Marketers',
         },
         twitter: {
             card: 'summary_large_image',
-            title: `I'm ${character.name} - The ${character.role}`,
-            description: character.description.slice(0, 200),
-            images: [`${siteUrl}/api/og?character=${character.id}`],
+            title: `Sono ${character.name} nel mondo del Marketing!`,
+            description: `Ho scoperto di essere ${character.role} - Fai il quiz!`,
+            images: [`${siteUrl}/result/${character.id}/opengraph-image`],
         },
     };
 }

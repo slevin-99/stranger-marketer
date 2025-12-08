@@ -128,7 +128,7 @@ export default async function Image({ params }: { params: { character: string } 
                         }}
                     >
                         <div style={{ color: character.color, fontSize: 18, marginBottom: 5 }}>CHE MARKETER DI STRANGER THINGS SEI?</div>
-                        <div style={{ color: '#666', fontSize: 16 }}>strangemarketer.app</div>
+                        <div style={{ color: '#666', fontSize: 16 }}>stranger-marketers.com</div>
                     </div>
                 </div>
             </div>
