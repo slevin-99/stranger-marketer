@@ -161,7 +161,39 @@ export default function ShareButtons({ character }: ShareButtonsProps) {
     };
 
     const handleShare = async (platform: 'linkedin' | 'instagram' | 'twitter') => {
-        // LinkedIn and Twitter: Prefer Link Sharing (preview handled by OG Image)
+        // 1. Try Native Share (System Sheet) - BEST FOR MOBILE APPS
+        // This allows sharing Image + Text + URL directly to apps (Instagram, LinkedIn, etc.)
+        if (shareFile && navigator.canShare && navigator.canShare({ files: [shareFile] })) {
+            try {
+                // Determine strictly necessary data. 
+                // Note: Some apps (like Instagram) ignore text/url if a file is present.
+                // Others (LinkedIn) might handle all.
+                // We send everything we can; the OS filters what the target app accepts.
+                await navigator.share({
+                    files: [shareFile],
+                    title: 'Stranger Things Marketer Quiz',
+                    text: shareText,
+                    url: shareUrl,
+                });
+                return; // Success!
+            } catch (err) {
+                // User cancelled or share failed.
+                console.log('Native share failed/cancelled', err);
+                // If failed (not cancelled), we might want to fall through? 
+                // But usually 'cancelled' throws an error too.
+                // We'll stop here to avoid annoyed fallback behavior if user just clicked 'X'.
+                if ((err as Error).name !== 'AbortError') {
+                    // If it was a real error, maybe try fallback?
+                    // Let's fall through only if it wasn't an abort.
+                } else {
+                    return;
+                }
+            }
+        }
+
+        // 2. Desktop / Fallback Behavior
+
+        // LinkedIn / Twitter: Web Intents (Text + URL only, no image file)
         if (platform === 'linkedin') {
             window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
             return;
@@ -171,36 +203,10 @@ export default function ShareButtons({ character }: ShareButtonsProps) {
             return;
         }
 
-        // Instagram / Mobile Share
+        // Instagram Fallback: Download Image
         if (platform === 'instagram') {
-            // If file isn't ready yet, we can't share instantly. 
-            // Ideally we disable the button until ready, but as fallback we can try to generate (though it might fail on mobile)
-            const fileToShare = shareFile;
-
-            if (!fileToShare) {
-                // Fallback if user clicks TOO fast
-                alert("L'immagine si sta ancora generando, riprova tra un secondo!");
-                return;
-            }
-
-            if (navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
-                try {
-                    await navigator.share({
-                        files: [fileToShare],
-                        title: 'Stranger Things Marketer Quiz',
-                        text: shareText,
-                    });
-                } catch (err) {
-                    // Share cancelled or failed
-                    console.log('Share error:', err);
-                }
-            } else {
-                // Fallback for Desktop or unsupported browsers: Download
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(fileToShare);
-                link.download = fileToShare.name;
-                link.click();
-            }
+            downloadImage();
+            // Optional: alert user instructions for desktop?
         }
     };
 
