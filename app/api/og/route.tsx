@@ -66,7 +66,7 @@ export async function GET(request: Request) {
                     >
                         {/* Image */}
                         <img
-                            src={new URL(character.image, request.url).toString()}
+                            src={`https://stranger-marketers.com${character.image}`}
                             alt={character.name}
                             style={{
                                 width: '250px',
