@@ -1,7 +1,10 @@
 import { Character } from "./types";
 
 export const shareTexts = {
-    linkedin: (character: Character) => `🎬 Ho appena scoperto di essere ${character.name}, "${character.nickname}" nel team marketing di Hawkins!
+    linkedin: (character: Character) => {
+        const resultUrl = `https://stranger-marketers.com/result/${character.id}`;
+
+        return `🎬 Ho appena scoperto di essere ${character.name}, "${character.nickname}" nel team marketing di Hawkins!
 
 ✨ Il mio superpotere: ${character.superpower}
 ⚠️ Il mio punto debole: ${character.weakness}
@@ -9,9 +12,11 @@ export const shareTexts = {
 ${character.mantra ? `💭 Il mio mantra: "${character.mantra}"` : ''}
 
 Quale personaggio di Stranger Things sei tu nel marketing? 👇
-Fai il quiz: https://stranger-marketers.com/
 
-#Marketing #StrangerThings #DigitalMarketing #MarketingQuiz`,
+🎯 Fai il quiz qui: ${resultUrl}
+
+#Marketing #StrangerThings #DigitalMarketing #MarketingQuiz #ContentStrategy`;
+    },
 
     twitter: (character: Character) => `🎯 Sono ${character.name} - ${character.nickname}!
 

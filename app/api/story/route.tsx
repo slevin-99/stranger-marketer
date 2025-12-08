@@ -17,121 +17,123 @@ export async function GET(request: Request) {
             (
                 <div
                     style={{
-                        height: '100%',
                         width: '100%',
+                        height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: '#0a0a0a',
-                        backgroundImage: `linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%)`,
-                        position: 'relative',
-                        color: 'white',
-                        fontFamily: 'sans-serif',
+                        background: `linear-gradient(135deg, ${character.color}20 0%, #0a0a0a 100%)`,
+                        padding: '80px 60px',
                     }}
                 >
-                    {/* Background Glow */}
+                    {/* Immagine personaggio in alto */}
                     <div
                         style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background: `radial-gradient(circle at 50% 30%, ${character.color}40, transparent 60%)`,
-                            opacity: 0.5,
-                        }}
-                    />
-
-                    {/* Header */}
-                    <div style={{ fontSize: 60, color: 'white', marginBottom: 60, textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center' }}>
-                        STRANGER MARKETERS <br /> QUIZ
-                    </div>
-
-                    {/* Card */}
-                    <div
-                        style={{
+                            width: '400px',
+                            height: '400px',
+                            borderRadius: '50%',
+                            border: `8px solid ${character.color}`,
                             display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            background: 'rgba(0,0,0,0.7)',
-                            border: `2px solid ${character.color}`,
-                            padding: '60px',
-                            borderRadius: '40px',
-                            boxShadow: `0 0 80px ${character.color}40`,
-                            marginBottom: '80px',
-                            width: '80%',
+                            marginBottom: '60px',
+                            boxShadow: `0 0 60px ${character.color}80`,
+                            overflow: 'hidden',
                         }}
                     >
                         <img
                             src={new URL(character.image, request.url).toString()}
                             alt={character.name}
                             style={{
-                                width: '400px',
-                                height: '400px',
-                                borderRadius: '50%',
-                                border: `8px solid ${character.color}`,
+                                width: '100%',
+                                height: '100%',
                                 objectFit: 'cover',
-                                marginBottom: '40px',
                             }}
                         />
-                        <div
+                    </div>
+
+                    {/* Nome e ruolo */}
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            textAlign: 'center',
+                        }}
+                    >
+                        <h1
                             style={{
-                                fontSize: '80px',
+                                fontSize: '120px',
                                 fontWeight: 'bold',
-                                textTransform: 'uppercase',
                                 color: 'white',
-                                marginBottom: '20px',
-                                textShadow: `0 0 20px ${character.color}`,
-                                textAlign: 'center',
+                                textTransform: 'uppercase',
+                                margin: '0 0 20px 0',
+                                textShadow: `0 0 30px ${character.color}`,
                             }}
                         >
                             {character.name}
-                        </div>
-                        <div
+                        </h1>
+
+                        <p
                             style={{
-                                fontSize: '32px',
-                                color: '#00d4ff',
-                                textTransform: 'uppercase',
-                                letterSpacing: '6px',
-                                textAlign: 'center',
-                                fontFamily: 'monospace',
+                                fontSize: '48px',
+                                color: character.color,
+                                margin: '0 0 40px 0',
                             }}
                         >
                             {character.nickname}
+                        </p>
+
+                        <div
+                            style={{
+                                fontSize: '40px',
+                                color: '#888',
+                                border: `3px solid ${character.color}40`,
+                                padding: '20px 40px',
+                                borderRadius: '15px',
+                                marginBottom: '60px',
+                                textTransform: 'uppercase',
+                            }}
+                        >
+                            {character.role}
                         </div>
                     </div>
 
-                    {/* CTA */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-                        <div style={{ fontSize: '40px', fontWeight: 'bold', color: 'white' }}>
-                            FAI ANCHE TU IL QUIZ
-                        </div>
-                        <div
+                    {/* Call to action */}
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            marginTop: 'auto',
+                        }}
+                    >
+                        <p
                             style={{
-                                fontSize: '32px',
-                                color: character.color,
-                                border: `2px solid ${character.color}`,
-                                padding: '15px 40px',
-                                borderRadius: '50px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '2px',
-                                background: 'rgba(255,255,255,0.1)'
+                                fontSize: '52px',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                margin: '0 0 30px 0',
+                            }}
+                        >
+                            FAI ANCHE TU IL QUIZ! 👆
+                        </p>
+
+                        <p
+                            style={{
+                                fontSize: '44px',
+                                color: '#666',
+                                margin: 0,
                             }}
                         >
                             stranger-marketers.com
-                        </div>
-                    </div>
-
-                    <div style={{ position: 'absolute', bottom: 80, fontSize: 30, color: 'rgba(255,255,255,0.5)' }}>
-                        LINK IN BIO
+                        </p>
                     </div>
                 </div>
             ),
             {
                 width: 1080,
-                height: 1920,
-            },
+                height: 1920, // Formato Instagram Story
+            }
         );
     } catch (e: any) {
         return new Response(`Failed to generate the image`, {

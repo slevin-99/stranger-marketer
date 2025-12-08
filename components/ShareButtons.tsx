@@ -1,105 +1,205 @@
 import { Character } from "@/lib/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { shareTexts } from "@/lib/shareTexts";
-import { getShareUrl, copyToClipboard } from "@/lib/shareUtils";
+import { canUseWebShare, nativeShare, canShareFiles, urlToFile } from '@/lib/shareUtils';
 
 interface ShareButtonsProps {
     character: Character;
 }
 
 export default function ShareButtons({ character }: ShareButtonsProps) {
-    const [copied, setCopied] = useState(false);
-    const [downloading, setDownloading] = useState(false);
+    const [toast, setToast] = useState<string | null>(null);
+    const [isMobile, setIsMobile] = useState(false);
 
     // Dynamic Result URL
     const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://stranger-marketers.com';
     const resultUrl = `${siteUrl}/result/${character.id}`;
 
-    const handleShare = (platform: 'linkedin' | 'twitter' | 'whatsapp') => {
-        let text = '';
-        if (platform === 'linkedin') text = shareTexts.linkedin(character);
-        if (platform === 'twitter') text = shareTexts.twitter(character);
-        if (platform === 'whatsapp') text = shareTexts.whatsapp(character);
+    useEffect(() => {
+        setIsMobile(canUseWebShare());
+    }, []);
 
-        const url = getShareUrl(platform, text, resultUrl);
+    const showToast = (message: string) => {
+        setToast(message);
+        setTimeout(() => setToast(null), 3000);
+    };
 
-        if (platform === 'linkedin') {
-            copyToClipboard(text);
-            setCopied(true); // Reusing the "Copied" state for feedback
-            setTimeout(() => setCopied(false), 3000);
-            window.open(url, '_blank');
-        } else {
-            window.open(url, '_blank');
+    const handleLinkedInShare = async () => {
+        const text = shareTexts.linkedin(character);
+
+        // MOBILE: usa Web Share API nativa
+        if (isMobile) {
+            const shareData = {
+                title: `I'm ${character.name} - ${character.nickname}`,
+                text: text,
+                url: resultUrl
+            };
+
+            const success = await nativeShare(shareData);
+
+            if (success) {
+                return;
+            }
+            // Se fallisce, continua al fallback desktop
+        }
+
+        // DESKTOP: fallback al metodo copy + open
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast('✅ Testo copiato! Incollalo nel post LinkedIn');
+
+            setTimeout(() => {
+                const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(resultUrl)}`;
+                window.open(linkedInUrl, '_blank');
+            }, 1500);
+        } catch (err) {
+            console.error('Errore:', err);
         }
     };
 
-    const handleInstagramShare = () => {
-        // Since Instagram sharing from web is limited, we point to the story download
-        // Or keeping it simple: just download the story image
-        window.open(`/api/story?character=${character.id}`, '_blank');
+    const handleTwitterShare = async () => {
+        const text = shareTexts.twitter(character);
+
+        // MOBILE: usa Web Share API
+        if (isMobile) {
+            const success = await nativeShare({
+                title: `I'm ${character.name}`,
+                text: text,
+                url: resultUrl
+            });
+            if (success) return;
+        }
+
+        // DESKTOP: apri Twitter web
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(resultUrl)}`;
+        window.open(twitterUrl, '_blank');
     };
 
-    const handleDownloadCard = () => {
-        // Use the OG image endpoint for download
-        setDownloading(true);
+    const handleWhatsAppShare = async () => {
+        const text = shareTexts.whatsapp(character);
+
+        // MOBILE: usa Web Share API
+        if (isMobile) {
+            const success = await nativeShare({
+                title: `Quiz Stranger Things Marketing`,
+                text: `${text}\n\n${resultUrl}`,
+                url: '' // Già incluso nel text per WhatsApp
+            });
+            if (success) return;
+        }
+
+        // DESKTOP: Web WhatsApp
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + resultUrl)}`;
+        window.open(whatsappUrl, '_blank');
+    };
+
+    const handleInstagramShare = async () => {
+        // Su mobile, prova a condividere l'immagine direttamente
+        if (isMobile && canShareFiles()) {
+            try {
+                // URL dell'immagine della story
+                const storyImageUrl = `/api/story?character=${character.id}`;
+
+                // Converti in File
+                const imageFile = await urlToFile(storyImageUrl, `stranger-marketer-${character.id}-story.png`);
+
+                if (imageFile) {
+                    const success = await nativeShare({
+                        title: `I'm ${character.name}!`,
+                        text: shareTexts.instagram(character),
+                        url: resultUrl,
+                        files: [imageFile]
+                    });
+
+                    if (success) return;
+                }
+            } catch (err) {
+                console.error('Errore condivisione immagine:', err);
+            }
+        }
+
+        // FALLBACK: scarica l'immagine
+        const storyImageUrl = `/api/story?character=${character.id}`;
+
         const link = document.createElement('a');
-        link.href = `/api/story?character=${character.id}`; // Downloading the vertical story version as "Card"
+        link.href = storyImageUrl;
         link.download = `stranger-marketer-${character.id}-story.png`;
+        document.body.appendChild(link);
         link.click();
-        setDownloading(false);
+        document.body.removeChild(link);
+
+        showToast('📸 Immagine scaricata! Aprilo in Instagram e condividila nella tua Story');
     };
 
-    const handleCopyLink = () => {
-        navigator.clipboard.writeText(resultUrl);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    const handleGenericShare = async () => {
+        const text = shareTexts.linkedin(character); // Generic text uses linkedin template as it is most complete
+
+        if (isMobile) {
+            await nativeShare({
+                title: `I'm ${character.name} - Stranger Things Marketing Quiz`,
+                text: text,
+                url: resultUrl
+            });
+        } else {
+            // Copia link
+            await navigator.clipboard.writeText(resultUrl);
+            showToast('🔗 Link copiato negli appunti!');
+        }
     };
 
     return (
-        <div className="flex flex-col gap-4 mt-8 w-full">
-            {copied && (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="text-center text-neon-green text-xs font-mono mb-2"
-                >
-                    TESTO COPIATO! INCOLLALO NEL TUO POST
-                </motion.div>
+        <div className="flex flex-col gap-4 mt-8 w-full relative">
+            {toast && (
+                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 
+                  bg-[#0077b5] text-white px-6 py-4 rounded-lg shadow-[0_0_30px_rgba(0,119,181,0.5)]
+                  border border-white/20
+                  animate-in fade-in slide-in-from-top-2 duration-300 font-bold text-sm max-w-[90vw] text-center">
+                    {toast}
+                </div>
             )}
 
-            <div className="flex gap-3 justify-center flex-wrap">
+            {isMobile && (
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleGenericShare}
+                    className="w-full py-4 px-6 bg-gradient-to-r from-neon-blue to-neon-purple 
+                     text-white font-bold rounded-lg uppercase tracking-wider shadow-[0_0_20px_rgba(0,212,255,0.3)]"
+                >
+                    📱 CONDIVIDI RISULTATO
+                </motion.button>
+            )}
+
+            <div className="grid grid-cols-2 gap-3">
                 <ShareButton
                     label="LinkedIn"
-                    onClick={() => handleShare('linkedin')}
+                    onClick={handleLinkedInShare}
                     color="bg-[#0077b5] hover:shadow-[0_0_15px_#0077b5]"
                 />
                 <ShareButton
-                    label="Story"
-                    onClick={() => handleDownloadCard()}
+                    label="Instagram"
+                    onClick={handleInstagramShare}
                     color="bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:shadow-[0_0_15px_#dc2743]"
                 />
                 <ShareButton
                     label="X / Twitter"
-                    onClick={() => handleShare('twitter')}
+                    onClick={handleTwitterShare}
                     color="bg-black border border-white/20 hover:border-white"
                 />
                 <ShareButton
                     label="WhatsApp"
-                    onClick={() => handleShare('whatsapp')}
+                    onClick={handleWhatsAppShare}
                     color="bg-[#25D366] hover:shadow-[0_0_15px_#25D366]"
                 />
             </div>
 
-            <div className="flex gap-3 justify-center">
-                <button
-                    onClick={handleCopyLink}
-                    className="text-xs font-mono text-white/50 hover:text-white underline decoration-dotted underline-offset-4 transition-colors"
-                >
-                    {copied ? "LINK COPIATO!" : "COPIA LINK RISULTATO"}
-                </button>
-            </div>
+            <button
+                onClick={handleGenericShare}
+                className="w-full py-2 text-xs font-mono text-white/50 hover:text-white underline decoration-dotted underline-offset-4 transition-colors"
+            >
+                {isMobile ? "COPIA SOLO IL LINK" : "COPIA LINK RISULTATO"}
+            </button>
         </div>
     );
 }
