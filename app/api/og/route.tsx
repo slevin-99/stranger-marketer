@@ -1,4 +1,4 @@
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'next/og';
 import { characters } from '@/lib/quizData';
 
 export const runtime = 'edge';
