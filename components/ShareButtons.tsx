@@ -28,23 +28,9 @@ export default function ShareButtons({ character }: ShareButtonsProps) {
     const handleLinkedInShare = async () => {
         const text = shareTexts.linkedin(character);
 
-        // MOBILE: usa Web Share API nativa
-        if (isMobile) {
-            const shareData = {
-                title: `I'm ${character.name} - ${character.nickname}`,
-                text: text,
-                url: resultUrl
-            };
-
-            const success = await nativeShare(shareData);
-
-            if (success) {
-                return;
-            }
-            // Se fallisce, continua al fallback desktop
-        }
-
-        // DESKTOP: fallback al metodo copy + open
+        // ALWAYS use the Copy + Open flow for LinkedIn
+        // This ensures specific targeting of the LinkedIn app/site and proper text copying
+        // instead of the generic system share sheet.
         try {
             await navigator.clipboard.writeText(text);
             showToast('✅ Testo copiato! Incollalo nel post LinkedIn');
@@ -52,9 +38,12 @@ export default function ShareButtons({ character }: ShareButtonsProps) {
             setTimeout(() => {
                 const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(resultUrl)}`;
                 window.open(linkedInUrl, '_blank');
-            }, 1500);
+            }, 1000);
         } catch (err) {
             console.error('Errore:', err);
+            // Backup functionality if clipboard fails
+            const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(resultUrl)}`;
+            window.open(linkedInUrl, '_blank');
         }
     };
 
