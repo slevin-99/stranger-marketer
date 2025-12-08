@@ -15,9 +15,6 @@ export async function GET(request: Request) {
             return new Response('Character not found', { status: 404 });
         }
 
-        // Font loading (basic implementation using standard fonts for now to speed up)
-        // Ideally we would load custom fonts here.
-
         return new ImageResponse(
             (
                 <div
@@ -29,110 +26,86 @@ export async function GET(request: Request) {
                         alignItems: 'center',
                         justifyContent: 'center',
                         backgroundColor: '#0a0a0a',
-                        backgroundImage: `linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)`,
-                        position: 'relative',
-                        color: 'white',
+                        backgroundImage: `radial-gradient(circle at 50% 50%, ${character.color}40, #0a0a0a 70%)`,
                         fontFamily: 'sans-serif',
                     }}
                 >
-                    {/* Background Glow */}
-                    <div
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background: `radial-gradient(circle at 50% 50%, ${character.color}40, transparent 70%)`,
-                            opacity: 0.4,
-                        }}
-                    />
-
-                    {/* Content Container */}
+                    {/* Main Container */}
                     <div
                         style={{
                             display: 'flex',
-                            flexDirection: 'row',
+                            flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '40px',
-                            zIndex: 10,
-                            background: 'rgba(0,0,0,0.6)',
-                            border: `1px solid ${character.color}60`,
-                            borderRadius: '20px',
-                            padding: '40px 60px',
-                            boxShadow: `0 0 50px ${character.color}40`,
+                            border: `4px solid ${character.color}`,
+                            padding: '60px 80px',
+                            backgroundColor: 'rgba(0,0,0,0.7)',
                         }}
                     >
-                        {/* Image */}
-                        <img
-                            src={`https://stranger-marketers.com${character.image}`}
-                            alt={character.name}
-                            style={{
-                                width: '250px',
-                                height: '250px',
-                                borderRadius: '50%',
-                                border: `4px solid ${character.color}`,
-                                objectFit: 'cover',
-                            }}
-                        />
+                        {/* IO SONO */}
+                        <div style={{ color: 'white', fontSize: 32, marginBottom: 20, fontWeight: 'bold' }}>
+                            IO SONO
+                        </div>
 
-                        {/* Text Info */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <div
-                                style={{
-                                    fontSize: '80px',
-                                    fontWeight: 'bold',
-                                    textTransform: 'uppercase',
-                                    color: 'white',
-                                    lineHeight: 1,
-                                    marginBottom: '10px',
-                                    textShadow: `0 0 20px ${character.color}`,
-                                }}
-                            >
-                                {character.name}
-                            </div>
-                            <div
-                                style={{
-                                    fontSize: '30px',
-                                    color: '#00d4ff',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '4px',
-                                    marginBottom: '20px',
-                                    fontFamily: 'monospace',
-                                }}
-                            >
-                                {character.nickname}
-                            </div>
-                            <div
-                                style={{
-                                    fontSize: '24px',
-                                    color: character.color,
-                                    border: `1px solid ${character.color}`,
-                                    padding: '8px 20px',
-                                    borderRadius: '8px',
-                                    backgroundColor: 'rgba(255,255,255,0.05)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '2px',
-                                }}
-                            >
-                                ROLE: {character.role}
-                            </div>
+                        {/* Character Name */}
+                        <div
+                            style={{
+                                color: character.color,
+                                fontSize: 100,
+                                fontWeight: 900,
+                                textTransform: 'uppercase',
+                                textAlign: 'center',
+                                marginBottom: 20,
+                                lineHeight: 1,
+                            }}
+                        >
+                            {character.name}
+                        </div>
+
+                        {/* Role */}
+                        <div
+                            style={{
+                                color: 'white',
+                                fontSize: 36,
+                                textTransform: 'uppercase',
+                                letterSpacing: '6px',
+                                marginBottom: 40,
+                                textAlign: 'center',
+                            }}
+                        >
+                            {character.role}
+                        </div>
+
+                        {/* Mantra */}
+                        <div
+                            style={{
+                                color: '#888',
+                                fontSize: 24,
+                                fontStyle: 'italic',
+                                textAlign: 'center',
+                                maxWidth: '80%',
+                            }}
+                        >
+                            "{character.mantra}"
                         </div>
                     </div>
 
-                    {/* Footer / Watermark */}
+                    {/* Footer */}
                     <div
                         style={{
                             position: 'absolute',
-                            bottom: '30px',
-                            fontSize: '24px',
-                            color: '#666',
-                            textTransform: 'uppercase',
-                            letterSpacing: '4px',
+                            bottom: '40px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
                         }}
                     >
-                        stranger-marketers.com
+                        <div style={{ color: character.color, fontSize: 20, marginBottom: 8 }}>
+                            CHE MARKETER DI STRANGER THINGS SEI?
+                        </div>
+                        <div style={{ color: '#555', fontSize: 18 }}>
+                            stranger-marketers.com
+                        </div>
                     </div>
                 </div>
             ),
@@ -141,10 +114,12 @@ export async function GET(request: Request) {
                 height: 630,
             },
         );
-    } catch (e: any) {
-        console.log(`${e.message}`);
-        return new Response(`Failed to generate the image`, {
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : 'Unknown error';
+        console.log(`OG Image Generation Error: ${message}`);
+        return new Response(`Failed to generate the image: ${message}`, {
             status: 500,
         });
     }
 }
+
