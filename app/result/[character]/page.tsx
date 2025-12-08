@@ -26,7 +26,7 @@ export async function generateMetadata(
             description: `Ho scoperto di essere ${character.role} - Fai il quiz!`,
             images: [
                 {
-                    url: `${siteUrl}/result/${character.id}/opengraph-image`,
+                    url: `${siteUrl}/api/og?character=${character.id}`,
                     width: 1200,
                     height: 630,
                     alt: `${character.name} - ${character.role}`,
@@ -40,7 +40,7 @@ export async function generateMetadata(
             card: 'summary_large_image',
             title: `Sono ${character.name} nel mondo del Marketing!`,
             description: `Ho scoperto di essere ${character.role} - Fai il quiz!`,
-            images: [`${siteUrl}/result/${character.id}/opengraph-image`],
+            images: [`${siteUrl}/api/og?character=${character.id}`],
         },
     };
 }
